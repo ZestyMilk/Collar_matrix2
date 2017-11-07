@@ -11,24 +11,24 @@ const bool    kMatrixSerpentineLayout = true;
 
 
 // This example combines two features of FastLED to produce a remarkable range of
-// effects from a relatively small amount of code.  This example combines FastLED's 
+// effects from a relatively small amount of code.  This example combines FastLED's
 // color palette lookup functions with FastLED's Perlin/simplex noise generator, and
 // the combination is extremely powerful.
 //
 // You might want to look at the "ColorPalette" and "Noise" examples separately
 // if this example code seems daunting.
 //
-// 
-// The basic setup here is that for each frame, we generate a new array of 
+//
+// The basic setup here is that for each frame, we generate a new array of
 // 'noise' data, and then map it onto the LED matrix through a color palette.
 //
 // Periodically, the color palette is changed, and new noise-generation parameters
 // are chosen at the same time.  In this example, specific noise-generation
-// values have been selected to match the given color palettes; some are faster, 
-// or slower, or larger, or smaller than others, but there's no reason these 
+// values have been selected to match the given color palettes; some are faster,
+// or slower, or larger, or smaller than others, but there's no reason these
 // parameters can't be freely mixed-and-matched.
 //
-// In addition, this example includes some fast automatic 'data smoothing' at 
+// In addition, this example includes some fast automatic 'data smoothing' at
 // lower noise speeds to help produce smoother animations in those cases.
 //
 // The FastLED built-in color palettes (Forest, Clouds, Lava, Ocean, Party) are
@@ -87,12 +87,12 @@ void fillnoise8() {
   if( speed < 50) {
     dataSmoothing = 200 - (speed * 4);
   }
-  
+
   for(int i = 0; i < MAX_DIMENSION; i++) {
     int ioffset = scale * i;
     for(int j = 0; j < MAX_DIMENSION; j++) {
       int joffset = scale * j;
-      
+
       uint8_t data = inoise8(x + ioffset,y + joffset,z);
 
       // The range of the inoise8 function is roughly 16-238.
@@ -106,13 +106,13 @@ void fillnoise8() {
         uint8_t newdata = scale8( olddata, dataSmoothing) + scale8( data, 256 - dataSmoothing);
         data = newdata;
       }
-      
+
       noise[i][j] = data;
     }
   }
-  
+
   z += speed;
-  
+
   // apply slow drift to X and Y, just for visual variation.
   x += speed / 8;
   y -= speed / 16;
@@ -121,7 +121,7 @@ void fillnoise8() {
 void mapNoiseToLEDsUsingPalette()
 {
   static uint8_t ihue=0;
-  
+
   for(int i = 0; i < kMatrixWidth; i++) {
     for(int j = 0; j < kMatrixHeight; j++) {
       // We use the value at the (i,j) coordinate in the noise
@@ -132,11 +132,11 @@ void mapNoiseToLEDsUsingPalette()
       uint8_t bri =   noise[i][j];
 
       // if this palette is a 'loop', add a slowly-changing base value
-      if( colorLoop) { 
+      if( colorLoop) {
         index += ihue;
       }
 
-      // brighten up, as the color palette itself often contains the 
+      // brighten up, as the color palette itself often contains the
       // light/dark dynamic range desired
       if( bri > 127 ) {
         bri = 255;
@@ -148,7 +148,7 @@ void mapNoiseToLEDsUsingPalette()
       leds[XY(i,j)] = color;
     }
   }
-  
+
   ihue+=1;
 }
 
@@ -158,7 +158,7 @@ void loop() {
 
   // generate noise data
   fillnoise8();
-  
+
   // convert the noise data to colors in the LED array
   // using the current palette
   mapNoiseToLEDsUsingPalette();
@@ -184,38 +184,31 @@ void loop() {
 
 void ChangePaletteAndSettingsPeriodically()
 {
-  uint8_t secondHand = ((millis() / 1000) / HOLD_PALETTES_X_TIMES_AS_LONG) % 60;
-  static uint8_t lastSecond = 99;
-  
-  if( lastSecond != secondHand) {
-    lastSecond = secondHand;
-    if( secondHand ==  0)  { currentPalette = RainbowColors_p;         speed = 20; scale = 30; colorLoop = 1; }
-    if( secondHand ==  5)  { SetupPurpleAndGreenPalette();             speed = 10; scale = 50; colorLoop = 1; }
-    if( secondHand == 10)  { SetupBlackAndWhiteStripedPalette();       speed = 20; scale = 30; colorLoop = 1; }
-    if( secondHand == 15)  { currentPalette = ForestColors_p;          speed =  8; scale =120; colorLoop = 0; }
-    if( secondHand == 20)  { currentPalette = CloudColors_p;           speed =  4; scale = 30; colorLoop = 0; }
-    if( secondHand == 25)  { currentPalette = LavaColors_p;            speed =  8; scale = 50; colorLoop = 0; }
-    if( secondHand == 30)  { currentPalette = OceanColors_p;           speed = 20; scale = 90; colorLoop = 0; }
-    if( secondHand == 35)  { currentPalette = PartyColors_p;           speed = 20; scale = 30; colorLoop = 1; }
-    if( secondHand == 40)  { SetupRandomPalette();                     speed = 20; scale = 20; colorLoop = 1; }
-    if( secondHand == 45)  { SetupRandomPalette();                     speed = 50; scale = 50; colorLoop = 1; }
-    if( secondHand == 50)  { SetupRandomPalette();                     speed = 90; scale = 90; colorLoop = 1; }
-    if( secondHand == 55)  { currentPalette = RainbowStripeColors_p;   speed = 30; scale = 20; colorLoop = 1; }
-  }
+  if(1) { currentPalette = RainbowColors_p;         speed = 20; scale = 30; colorLoop = 1; }
+  if(0) { SetupPurpleAndGreenPalette();             speed = 10; scale = 50; colorLoop = 1; }
+  if(0) { SetupBlackAndWhiteStripedPalette();       speed = 20; scale = 30; colorLoop = 1; }
+  if(0) { currentPalette = ForestColors_p;          speed =  8; scale =120; colorLoop = 0; }
+  if(0) { currentPalette = LavaColors_p;            speed =  8; scale = 50; colorLoop = 0; }
+  if(0) { currentPalette = OceanColors_p;           speed = 20; scale = 90; colorLoop = 0; }
+  if(0) { currentPalette = PartyColors_p;           speed = 20; scale = 30; colorLoop = 1; }
+  if(0) { SetupRandomPalette();                     speed = 20; scale = 20; colorLoop = 1; }
+  if(0) { SetupRandomPalette();                     speed = 50; scale = 50; colorLoop = 1; }
+  if(0) { SetupRandomPalette();                     speed = 90; scale = 90; colorLoop = 1; }
+  if(0) { currentPalette = RainbowStripeColors_p;   speed = 30; scale = 20; colorLoop = 1; }
 }
 
 // This function generates a random palette that's a gradient
-// between four different colors.  The first is a dim hue, the second is 
-// a bright hue, the third is a bright pastel, and the last is 
+// between four different colors.  The first is a dim hue, the second is
+// a bright hue, the third is a bright pastel, and the last is
 // another bright hue.  This gives some visual bright/dark variation
 // which is more interesting than just a gradient of different hues.
 void SetupRandomPalette()
 {
-  currentPalette = CRGBPalette16( 
-                      CHSV( random8(), 255, 32), 
-                      CHSV( random8(), 255, 255), 
-                      CHSV( random8(), 128, 255), 
-                      CHSV( random8(), 255, 255)); 
+  currentPalette = CRGBPalette16(
+                      CHSV( random8(), 255, 32),
+                      CHSV( random8(), 255, 255),
+                      CHSV( random8(), 128, 255),
+                      CHSV( random8(), 255, 255));
 }
 
 // This function sets up a palette of black and white stripes,
@@ -240,8 +233,8 @@ void SetupPurpleAndGreenPalette()
   CRGB purple = CHSV( HUE_PURPLE, 255, 255);
   CRGB green  = CHSV( HUE_GREEN, 255, 255);
   CRGB black  = CRGB::Black;
-  
-  currentPalette = CRGBPalette16( 
+
+  currentPalette = CRGBPalette16(
     green,  green,  black,  black,
     purple, purple, black,  black,
     green,  green,  black,  black,
@@ -270,4 +263,3 @@ uint16_t XY( uint8_t x, uint8_t y)
   }
   return i;
 }
-
